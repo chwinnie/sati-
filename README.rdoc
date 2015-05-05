@@ -1,3 +1,3 @@
 == Sati
 
-Sati compiles your Google Tasks and Google Calendar events for just the day to help you achieve full productivity. Authenticate through your Google account, and then choose which tasklists and calendar to pull tasks and events from.
+Sati compiles your Google Tasks and Google Calendar events for just the day to help you achieve full productivity. Authenticate through your Google account, and then choose which tasklists and calendar to pull tasks and events from. Enter the estimated time you believe each task will take (a feature that Google Tasks still lacks). Sati will then optimize and schedule the order in which you should complete the tasks, as well as show any events you need to attend.

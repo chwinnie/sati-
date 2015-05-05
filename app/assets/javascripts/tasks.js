@@ -8,21 +8,26 @@ $(document).ready(function() {
 
 	var refreshCalendarEvents = function refreshCalendarEvents() {
 		//remove curr calendar
-			$('#calendar').remove();
-			$('.calendar_row').append('<div id="calendar" style="display:block"></div>');
+		$('#calendar').remove();
+		$('.calendar_row').append('<div id="calendar" style="display:block"></div>');
 
-			//reload calendar
-			$('#calendar').fullCalendar({
-				header: false,
-				height: "auto",
-				minTime: currTime,
-				defaultView: 'agendaDay',	
-				defaultDate: '2015-05-04',
-				editable: true,
-				eventLimit: true, // allow "more" link when too many events
-				events: events_list
-			});	
-	};
+		var currTime = moment().minutes(0).seconds(0).format('HH:mm:ss');
+
+		var currDate = moment().hours(0).minutes(0).seconds(0).format();
+		console.log(currDate);
+
+		//reload calendar
+		$('#calendar').fullCalendar({
+			header: false,
+			height: "auto",
+			minTime: currTime,
+			defaultView: 'agendaDay',	
+			defaultDate: currDate,
+			editable: true,
+			eventLimit: true, // allow "more" link when too many events
+			events: events_list
+		});	
+	}.bind(this);
 
 	var implementSelectionUI = function implementSelectionUI($obj) {
 		var currBgColor = $obj.css('background-color');
@@ -37,19 +42,15 @@ $(document).ready(function() {
 	};
 
 	var updateEvent = function updateEvent(event_id, time_to_add) {
-		
-
 		var eventIndexToUpdate;
 		var oldEventData;
-		$.each(events_list, function(i, val) {
-			// console.log(val);
 
+		$.each(events_list, function(i, val) {
 			if (val.id === event_id) {
 				console.log('found event!');
 				eventIndexToUpdate = i;
 				oldEventData = val;
-			}
-			
+			}	
 		});
 
 		var currEndTime = moment(oldEventData['end']);
@@ -74,21 +75,14 @@ $(document).ready(function() {
 			var task_id = this.id;
 			tasks_time_estimates[task_id] = new_task_time_estimate;
 
+			var time_to_add = $('#'+task_id).val();
 
 			$.each(tasksToDisplay, function(key, val) {
 				if (val.id === task_id) {
 					console.log('ENTERED');
 					var taskTimeEstimate = tasks_time_estimates[val.id];
-					var endTime = moment().add(val, 'hours').format();
 					
-					var event = {
-						id: val.id,
-						title: val.title,
-						start: '2015-05-04T23:35:00',
-						end: endTime
-					}
-					
-					updateEvent(task_id, val); 
+					updateEvent(task_id, time_to_add); 
 				}
 			}.bind(this));
 		});
@@ -104,14 +98,14 @@ $(document).ready(function() {
 
 			$.each(tasksToDisplay, function(key, val) {
 				var taskTimeEstimate = tasks_time_estimates[val.id];
-				var endTime = moment().add(0.5, 'hours').format();
+				var endTime = moment().add(1, 'hour').format();
 
 				console.log(endTime);
 				
 				var event = {
 					id: val.id,
 					title: val.title,
-					start: '2015-05-04T23:00:00',
+					start: '2015-05-05T13:00:00',
 					end: endTime
 				}
 				
@@ -119,21 +113,7 @@ $(document).ready(function() {
 			});
 			
 
-			//remove curr calendar
-			$('#calendar').remove();
-			$('.calendar_row').append('<div id="calendar" style="display:block"></div>');
-
-			//reload calendar
-			$('#calendar').fullCalendar({
-				header: false,
-				height: "auto",
-				minTime: currTime,
-				defaultView: 'agendaDay',	
-				defaultDate: '2015-05-04',
-				editable: true,
-				eventLimit: true, // allow "more" link when too many events
-				events: events_list
-			});	
+			refreshCalendarEvents();
 
 		}
 		
@@ -162,18 +142,7 @@ $(document).ready(function() {
 		}
 
 	});
-
-	var currTime = moment().minutes(0).seconds(0).format('HH:mm:ss');
 	
-	$('#calendar').fullCalendar({
-			header: false,
-			height: "auto",
-			minTime: currTime,
-			defaultView: 'agendaDay',	
-			defaultDate: '2015-05-05',
-			editable: true,
-			eventLimit: true, // allow "more" link when too many events
-			events: events_list
-	});		
+	refreshCalendarEvents();	
 
 });

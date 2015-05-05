@@ -1,17 +1,17 @@
 <div class="container-fluid">
-	<div class="row">
+	<div class="row instructions">
 		<div class="col-md-4">
 			<p>Choose the tasklists you would like to use for Sati:</p>
 		</div>
-		<div class="col-md-4">
-			<p>Enter the time you think each task will take.</p>
+		<div class="col-md-4 task-time-estimates-panel">
+			<p style="visibility:hidden">Enter the time you think each task will take.</p>
 		</div>
 		<div class="col-md-4">
-			<p>Choose the calendar you would like to use for Sati:</p>
+			<p>Choose the calendars you would like to use for Sati:</p>
 		</div>
 	</div>
 
-	<div class="row">
+	<div class="row selectors">
 		<div class="col-md-4">  
 			<table class="tasklists_list" border="1">
 		  		<% @tasklists.each do |tasklist| %>

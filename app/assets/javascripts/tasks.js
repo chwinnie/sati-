@@ -6,6 +6,12 @@ $(document).ready(function() {
 	var events_list = [];
 	var tasks_time_estimates = {};
 
+	tasks_list = [
+		{id: 13413, title: 'task 1', startTime: moment().format(), endTime: moment().add(1, 'hour').format(), dueDate: moment('5/6/2015')},
+		{id: 13413, title: 'task 2', startTime: moment().format(), endTime: moment().add(1, 'hour').format(), dueDate: moment('5/5/2015')},
+		{id: 13413, title: 'task 3', startTime: moment().format(), endTime: moment().add(1, 'hour').format(), dueDate: moment('8/5/2015')}
+	]
+
 	var refreshCalendarEvents = function refreshCalendarEvents() {
 		//remove curr calendar
 		$('#calendar').remove();
@@ -14,7 +20,7 @@ $(document).ready(function() {
 		var currTime = moment().minutes(0).seconds(0).format('HH:mm:ss');
 
 		var currDate = moment().hours(0).minutes(0).seconds(0).format();
-		console.log(currDate);
+		// console.log(currDate);
 
 		//reload calendar
 		$('#calendar').fullCalendar({
@@ -47,7 +53,6 @@ $(document).ready(function() {
 
 		$.each(events_list, function(i, val) {
 			if (val.id === event_id) {
-				console.log('found event!');
 				eventIndexToUpdate = i;
 				oldEventData = val;
 			}	
@@ -66,7 +71,7 @@ $(document).ready(function() {
 		$.each(tasksToDisplay, function(key, val) {
 			var task_title = val.title;
 			var task_id = val.id;
-
+			
 			$('.task_times_list').append('<tr><td>' + task_title + '</td><td><input type="numeric" class="task_time_estimate" id='+task_id+'></td></tr>')
 		});
 
@@ -79,7 +84,6 @@ $(document).ready(function() {
 
 			$.each(tasksToDisplay, function(key, val) {
 				if (val.id === task_id) {
-					console.log('ENTERED');
 					var taskTimeEstimate = tasks_time_estimates[val.id];
 					
 					updateEvent(task_id, time_to_add); 
@@ -89,6 +93,7 @@ $(document).ready(function() {
 	};
 
 	$('.tasklists_list tr').click(function() {
+
 		var isSelection = implementSelectionUI($(this));
 
 		if (isSelection) {
@@ -101,16 +106,32 @@ $(document).ready(function() {
 				var startTime = moment().format();
 				var endTime = moment().add(1, 'hour').format();
 
-				console.log(endTime);
-				
+				// console.log(endTime);
+				console.log(val.due);
+				var dueDate;
+				if (val.due !== null) {
+					dueDate = val.due; 
+				} else {
+					dueDate = '';
+				}
+
 				var event = {
 					id: val.id,
 					title: val.title,
 					start: startTime,
-					end: endTime
+					end: endTime,
+					due: dueDate
 				}
 				
 				events_list.push(event);
+					//assume dueDates are Moments
+	events_list.sort(function(t1, t2) {
+		dueDate1 = t1.due;
+		dueDate2 = t2.due;
+		return dueDate1.diff(dueDate2);
+	});
+
+	console.log(events_list);
 			});
 			
 

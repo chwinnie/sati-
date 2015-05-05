@@ -170,7 +170,7 @@ $(document).ready(function() {
 			height: "auto",
 			minTime: currTime,
 			defaultView: 'agendaDay',	
-			defaultDate: '2015-05-04',
+			defaultDate: '2015-05-05',
 			editable: true,
 			eventLimit: true, // allow "more" link when too many events
 			events: events_list

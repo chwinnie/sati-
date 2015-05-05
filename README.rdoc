@@ -6,7 +6,7 @@ Known bugs:
 Google Authentication takes a minute to load--still need to optimize the API calls.
 
 Heroku link:
-https://sati-.herokuapp.com/
+https://satia.herokuapp.com/
 
 Gems used:
 * devise

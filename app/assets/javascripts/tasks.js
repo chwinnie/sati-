@@ -98,6 +98,7 @@ $(document).ready(function() {
 
 			$.each(tasksToDisplay, function(key, val) {
 				var taskTimeEstimate = tasks_time_estimates[val.id];
+				var startTime = moment().format();
 				var endTime = moment().add(1, 'hour').format();
 
 				console.log(endTime);
@@ -105,7 +106,7 @@ $(document).ready(function() {
 				var event = {
 					id: val.id,
 					title: val.title,
-					start: '2015-05-05T13:00:00',
+					start: startTime,
 					end: endTime
 				}
 				

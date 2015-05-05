@@ -17,41 +17,32 @@ class TasksController < ApplicationController
 			current_user.token.refresh!
 		end
 
-		client = Google::APIClient.new
-		client.authorization.client_id = ENV["GOOGLE_CLIENT_ID"]
-		client.authorization.client_secret = ENV["GOOGLE_CLIENT_SECRET"]
 		
-		client.authorization.access_token = current_user.token.access_token
+		@tasklists = view_context.get_tasklists_from_google
+		@calendars = view_context.get_calendars_events_from_google
 
-		tasks = client.discovered_api('tasks')
-		result = client.execute(
-        :api_method => tasks.tasklists.list)
-  		@tasklists = JSON.parse(result.body)["items"]
+  		@all_tasks = view_context.get_tasks_from_google(@tasklists)
+  		@all_events = view_context.get_events_from_google(@calendars)
 
-		client2 = Google::APIClient.new
-		client2.authorization.client_id = ENV["GOOGLE_CLIENT_ID"]
-		client2.authorization.client_secret = ENV["GOOGLE_CLIENT_SECRET"]
-		client2.authorization.access_token = current_user.token.access_token
+  		gon.all_tasks = @all_tasks
+  		gon.all_events = @all_events
 
-		calendar = client2.discovered_api('calendar', 'v3')
-		calendar_list_result = client2.execute(
-        :api_method => calendar.calendar_list.list)
-  		@calendars = JSON.parse(calendar_list_result.body)["items"]
-  		@testing = JSON.parse(calendar_list_result.body)
-  		@event_title = "MEOW"
+
+  		# @testing = JSON.parse(calendar_list_result.body)
+  		# @event_title = "MEOW"
 
   		#Time.now.utc.iso8601
-  		result = client2.execute(
-        :api_method => calendar.events.list,
-        :parameters => {calendarId: 'a3br144mi7v8b3a3g9kaor2j7k@group.calendar.google.com', timeMin: Time.now.utc.iso8601})
-        @events = JSON.parse(result.body)["items"]
+  # 		result = client2.execute(
+  #       :api_method => calendar.events.list,
+  #       :parameters => {calendarId: 'a3br144mi7v8b3a3g9kaor2j7k@group.calendar.google.com', timeMin: Time.now.utc.iso8601})
+  #       @events = JSON.parse(result.body)["items"]
 
-        @events.each do |event|
-			@summary = event["summary"]
-			@start = event["start"]["dateTime"]
-			@start = @start.slice(0...-7)
-			@end = event["end"]["dateTime"]
-		end
+  #       @events.each do |event|
+		# 	@summary = event["summary"]
+		# 	@start = event["start"]["dateTime"]
+		# 	@start = @start.slice(0...-7)
+		# 	@end = event["end"]["dateTime"]
+		# end
 
 
 	end

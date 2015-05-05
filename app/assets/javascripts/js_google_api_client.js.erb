@@ -1,0 +1,42 @@
+// <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
+var clientId = '<%= ENV['GOOGLE_CLIENT_ID']%>';
+
+var apiKey = '<%= ENV['GOOGLE_CLIENT_SECRET']%>';
+
+var scopes = 'https://www.googleapis.com/auth/calendar';
+
+function handleClientLoad() {
+  // Step 2: Reference the API key
+  console.log('handleClientLoad');
+  gapi.client.setApiKey(apiKey);
+  window.setTimeout(checkAuth,1);
+}
+
+function checkAuth() {
+  gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, makeApiCall);
+}
+
+function authorizeClient(event) {
+  // Step 3: get authorization to use private data
+  console.log('authorizeClient');
+  gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, makeApiCall);
+}
+
+// Load the API and make an API call.  Display the results on the screen.
+function makeApiCall() {
+  console.log('makeApiCall');
+  // Step 4: Load the Google+ API
+  gapi.client.load('calendar', 'v3').then(function() {
+    // Step 5: Assemble the API request
+    var request = gapi.client.calendar.calendarList.list({
+      'userId': 'me'
+    });
+    // Step 6: Execute the API request
+    request.then(function(resp) {
+      console.log(resp);
+    }, function(reason) {
+      console.log('Error: ' + reason.result.error.message);
+    });
+  });
+}
+

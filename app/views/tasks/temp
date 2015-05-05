@@ -1,0 +1,123 @@
+<% @events.each do |event| %>
+	<p><%= event["summary"] %></p>
+	<p><%= event["start"]["dateTime"] %></p>
+	<p><%= event["end"]["dateTime"] %></p>
+<% end %>
+
+<% @events.each do |key, value| %>
+  <h1><%= key %> </h1>
+  <p><%= value %> </p>
+<% end %>
+
+<%= javascript_tag do %>
+
+	$(document).ready(function() {
+		console.log(moment().format('HH:mm:ss'));
+		
+
+		$('#calendar').fullCalendar({
+			header: false,
+			height: "auto",
+			minTime: "05:00:00",
+			defaultView: 'agendaDay',	
+			defaultDate: '2015-02-12',
+			editable: true,
+			eventLimit: true, // allow "more" link when too many events
+			events: [
+				{
+					title: '<%= @summary %>',
+					start: '2015-02-01T16:00:00'
+				},
+				{
+					title: 'Long Event',
+					start: '2015-02-07',
+					end: '2015-02-10'
+				},
+				{
+					id: 999,
+					title: 'Repeating Event',
+					start: '2015-02-09T16:00:00'
+				},
+				{
+					id: 999,
+					title: 'Repeating Event',
+					start: '2015-02-16T16:00:00'
+				},
+				{
+					title: 'Conference',
+					start: '2015-02-11',
+					end: '2015-02-13'
+				},
+				{
+					title: 'Meeting',
+					start: '2015-02-12T10:30:00',
+					end: '2015-02-12T12:30:00'
+				},
+				{
+					title: 'Lunch',
+					start: '2015-02-12T12:00:00'
+				},
+				{
+					title: 'Meeting',
+					start: '2015-02-12T14:30:00'
+				},
+				{
+					title: 'Happy Hour',
+					start: '2015-02-12T17:30:00'
+				},
+				{
+					title: 'Dinner',
+					start: '2015-02-12T20:00:00'
+				},
+				{
+					title: 'Birthday Party',
+					start: '2015-02-13T07:00:00'
+				},
+				{
+					title: 'Click for Google',
+					url: 'http://google.com/',
+					start: '2015-02-28'
+				}
+			]
+		});
+		
+	});
+
+<% end %>
+
+<div class="row">
+				<div class="col-md-6">
+					<p>Choose the tasklists you would like to use for Sati:</p>
+				</div>
+				<div class="col-md-6">
+					<p>Choose the calendar you would like to use for Sati:</p>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-6">  
+					<table class="tasklists_list" border="1">
+				  		<% @tasklists.each do |tasklist| %>
+						  	<tr class="<%= tasklist["id"] %>">
+						      <td><%= tasklist["title"] %> </td>
+						      <% updated = DateTime.strptime(tasklist["updated"], format="%Y-%m-%dT%H:%M").strftime("%B %d %Y %H:%M") %>
+						      <td>Last updated at <%= updated %> </td>
+						    </tr>
+				 		<% end %>
+					</table>
+				</div>
+
+				<div class="col-md-6">
+					<table class="calendars_list" border="1">
+					  <% @calendars.each do |calendar| %>
+					  	<tr id="<%= calendar["id"] %>">
+					      <td><%= calendar["summary"] %> </td>
+					    </tr>
+					  <% end %>
+					</table>
+				</div>
+			</div>
+
+			<div class="row">
+				<div id='calendar' style="display:block"></div>
+			</div>

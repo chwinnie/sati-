@@ -12,7 +12,10 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require twitter/bootstrap
 //= require turbolinks
 //= require moment
 //= require fullcalendar
+//= require google_handle_client
+//= require js_google_api_client
 //= require_tree .

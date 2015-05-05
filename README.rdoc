@@ -5,6 +5,9 @@ Sati compiles your Google Tasks and Google Calendar events for just the day to h
 Known bugs:
 Google Authentication takes a minute to load--still need to optimize the API calls.
 
+Heroku link:
+https://sati-.herokuapp.com/
+
 Gems used:
 * devise
 * omniauth-google-oauth2

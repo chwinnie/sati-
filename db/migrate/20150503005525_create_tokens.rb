@@ -4,10 +4,8 @@ class CreateTokens < ActiveRecord::Migration
       t.string :access_token
       t.string :refresh_token
       t.datetime :expires_at
-      t.references :User, index: true
 
       t.timestamps null: false
     end
-    add_foreign_key :tokens, :Users
   end
 end

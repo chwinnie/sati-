@@ -13,11 +13,13 @@ class TasksController < ApplicationController
 # end
 
 	def index
+		puts "I get called" 
+		
 		if (current_user.token.expired?)
 			current_user.token.refresh!
 		end
 
-		
+
 		@tasklists = view_context.get_tasklists_from_google
 		@calendars = view_context.get_calendars_events_from_google
 

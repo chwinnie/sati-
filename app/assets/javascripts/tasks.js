@@ -106,7 +106,7 @@ $(document).ready(function() {
 				var startTime = moment().format();
 				var endTime = moment().add(1, 'hour').format();
 
-				// console.log(endTime);
+				console.log('printing val');
 				console.log(val.due);
 				var dueDate;
 				if (val.due !== null) {

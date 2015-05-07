@@ -38,6 +38,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'fullcalendar-rails'
 gem 'momentjs-rails'
 
+#js
+gem 'async-rails'
+
 #bootstrap
 gem "twitter-bootstrap-rails"
 

@@ -18,4 +18,5 @@
 //= require fullcalendar
 //= require google_handle_client
 //= require js_google_api_client
+//= require async
 //= require_tree .

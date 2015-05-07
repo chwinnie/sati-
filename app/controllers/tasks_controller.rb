@@ -20,7 +20,7 @@ class TasksController < ApplicationController
 
 
 		@tasklists = view_context.get_tasklists_from_google
-		@calendars = view_context.get_calendars_events_from_google
+		@calendars = view_context.get_calendars_from_google
 
   		@all_tasks = view_context.get_tasks_from_google(@tasklists)
   		@all_events = view_context.get_events_from_google(@calendars)

@@ -13,7 +13,7 @@ module TasksHelper
 		@tasklists
 	end
 
-	def get_calendars_events_from_google
+	def get_calendars_from_google
 		client = Google::APIClient.new
 		client.authorization.client_id = ENV["GOOGLE_CLIENT_ID"]
 		client.authorization.client_secret = ENV["GOOGLE_CLIENT_SECRET"]
@@ -59,6 +59,7 @@ module TasksHelper
 	end
 
 	def get_events_from_google(calendars)
+
 		client = Google::APIClient.new
 		client.authorization.client_id = ENV["GOOGLE_CLIENT_ID"]
 		client.authorization.client_secret = ENV["GOOGLE_CLIENT_SECRET"]
@@ -76,7 +77,8 @@ module TasksHelper
 			result = client.execute(
 	        :api_method => calendar_service.events.list,
 	        :parameters => { calendarId: calendar_id, 
-	        				 timeMin: Time.now.utc.iso8601})
+	        				 timeMin: Time.now.utc.iso8601,
+	        				 timeMax: (DateTime.now.midnight + 1.day - 1.second).utc.iso8601})
 
 	        events = JSON.parse(result.body)["items"]
 

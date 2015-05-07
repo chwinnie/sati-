@@ -9,14 +9,25 @@ $(document).ready(function() {
 	var MAX_DATE = moment().add(50, 'years'); //set as 50 years in future
 
 	tasks_list = [
-		{id: 13413, title: 'task 1', startTime: moment().format(), endTime: moment().add(1, 'hour').format(), dueDate: moment('5/6/2015')},
-		{id: 13413, title: 'task 2', startTime: moment().format(), endTime: moment().add(1, 'hour').format(), dueDate: moment('5/5/2015')},
-		{id: 13413, title: 'task 3', startTime: moment().format(), endTime: moment().add(1, 'hour').format(), dueDate: moment('8/5/2015')}
+		{id: 13413, title: 'task 1', 
+			startTime: moment().format(), 
+			endTime: moment().add(1, 'hour').format(), 
+			dueDate: moment('5/6/2015')},
+		{id: 13413, 
+			title: 'task 2', 
+			startTime: moment().format(), 
+			endTime: moment().add(1, 'hour').format(), 
+			dueDate: moment('5/5/2015')},
+		{id: 13413, 
+			title: 'task 3', 
+			startTime: moment().format(), 
+			endTime: moment().add(1, 'hour').format(), 
+			dueDate: moment('8/5/2015')}
 	];
 
-	var refreshCalendarEvents = function refreshCalendarEvents() {
+	var refreshCalendarEvents = function refreshCalendarEvents(all_events_list) {
 		console.log('refreshCalendarEvents');
-		console.log(eventsToDisplay);
+		// console.log(all_events_list);
 		//remove curr calendar
 		$('#calendar').remove();
 		$('.calendar_row').append('<div id="calendar" style="display:block"></div>');
@@ -34,7 +45,7 @@ $(document).ready(function() {
 			defaultDate: currDate.format(),
 			editable: true,
 			eventLimit: true, // allow "more" link when too many events
-			events: eventsToDisplay
+			events: all_events_list
 		});	
 	}.bind(this);
 
@@ -65,15 +76,11 @@ $(document).ready(function() {
 
 		currEventData['duration'] = time_to_add;
 
-		events_list[eventIndexToUpdate] = currEventData;
-
-
-		
-		
+		events_list[eventIndexToUpdate] = currEventData;		
 	};
 
 	var calculateOptimalSchedule = function calculateOptimalSchedule() {
-		console.log('calculateOptimalSchedule');
+		// console.log('calculateOptimalSchedule');
 
 		//sort events_list by dueDate, assume dueDates are Moments
 		events_list.sort(function(t1, t2) {
@@ -82,16 +89,24 @@ $(document).ready(function() {
 			return dueDate1.diff(dueDate2);
 		});
 
-		free_time_blocks = [ 
-			{start: moment(), end: moment().add(2, 'hours'), duration: 2},
+		var free_time_blocks = [ 
 			{start: moment().add(3, 'hours'), end: moment().add(4, 'hours'), duration: 1},
+			{start: moment(), end: moment().add(2, 'hours'), duration: 2},
 			{start: moment().add(7, 'hours'), end: moment().add(10, 'hours'), duration: 3}
 		];
+
+		free_time_blocks.sort(function(b1, b2) {
+			start1 = b1.start;
+			start2 = b2.start;
+			return start1.diff(start2);
+		});
+
+		console.log(free_time_blocks);
 
 		//clear events to schedule
 		var eventsLeftToSchedule = events_list;
 		// console.log(events_list);
-		console.log(eventsLeftToSchedule);
+		// console.log(eventsLeftToSchedule);
 		eventsToDisplay = [];
 
 		for (i = 0; i < free_time_blocks.length; i++) {
@@ -103,18 +118,33 @@ $(document).ready(function() {
 
 				console.log('freeTimeBlock');
 				console.log(freeTimeBlock);
-				console.log('event');
+				console.log(freeTimeBlock.start);
+				console.log(freeTimeBlock.end);
+				console.log('event before');
 				console.log(event);
 
 				if ((event.duration === 0) || (freeTimeBlock.duration < event.duration)) {
 					continue;
 				} else {
 					console.log('ENTERS');
-					event.start = freeTimeBlock.start;
-					event.end = moment(event.start).add(event.duration, 'hours');
-					eventsToDisplay.push(event);
+					
+					// console.log(freeTimeBlock.start);
+					// console.log(freeTimeBlock.start.add(parseInt(event.duration), 'hours'));
+
+					var updatedEvent = {
+						start: freeTimeBlock.start,
+						end: freeTimeBlock.start.add(event.duration, 'hours'),
+						duration: event.duration
+					}
+					console.log('updatedEvent');
+					console.log(updatedEvent);
+					eventsToDisplay.push(updatedEvent);
+
 					eventsLeftToSchedule.splice(j, 1);
 					j--;
+
+					console.log('eventsLeftToSchedule');
+					console.log(eventsLeftToSchedule);
 
 					// console.log('EVENT DURATION');
 					// console.log(event.duration);
@@ -131,7 +161,7 @@ $(document).ready(function() {
 
 		// console.log(eventsToDisplay);
 
-		refreshCalendarEvents();
+		refreshCalendarEvents(eventsToDisplay);
 	};
 
 	var showFlash = function showFlash(message) {
@@ -152,11 +182,12 @@ $(document).ready(function() {
 			var task_title = val.title;
 			var task_id = val.id;
 			
-			$('.task_times_list').append('<tr><td>' + task_title + '</td><td><input type="numeric" class="task_time_estimate" id='+task_id+'></td></tr>')
+			$('.task_times_list').append('<tr id="'+task_id+'"><td>' + task_title + '</td><td><input type="numeric" class="task_time_estimate" name="'+task_id+'""></td></tr>')
 		});
 
-		$('.task_time_estimate').keyup(function() {
+		$('.task_time_estimate').keyup(function(e) {
 			var new_task_time_estimate = $(this).val();
+			console.log(new_task_time_estimate);
 
 			//check if not a number
 			if (isNaN(new_task_time_estimate)) {
@@ -164,10 +195,15 @@ $(document).ready(function() {
 				return;
 			}
 
+			//do nothing if empty string
+			if (new_task_time_estimate === '') {
+				return;
+			}
+
 			var task_id = this.id;
 			tasks_time_estimates[task_id] = new_task_time_estimate;
 
-			var time_to_add = $('#'+task_id).val();
+			var time_to_add = $('input[name='+task_id+']').val();
 
 			$.each(tasksToDisplay, function(key, val) {
 				if (val.id === task_id) {
@@ -179,6 +215,13 @@ $(document).ready(function() {
 
 			calculateOptimalSchedule();
 		});
+	};
+
+	var removeTasksForTimeEstimates = function removeTasksForTimeEstimates(tasksToRemove) {
+		for (i = 0; i < tasksToRemove.length; i++) {
+			console.log(tasksToRemove[i].id);
+			$('#' + tasksToRemove[i].id).remove();
+		}
 	};
 
 	$('.tasklists_list tr').click(function() {
@@ -206,7 +249,7 @@ $(document).ready(function() {
 					id: val.id,
 					title: val.title,
 					start: startTime,
-					end: undefined,
+					end: endTime,
 					due: dueDate,
 					duration: 0
 				}
@@ -214,6 +257,25 @@ $(document).ready(function() {
 				events_list.push(event);
 				
 			});
+
+			refreshCalendarEvents(events_list);
+		} else {
+			var tasksToRemove = gon.all_tasks[this.id];
+
+			removeTasksForTimeEstimates(tasksToRemove);
+
+			for (i = 0; i < tasksToRemove.length; i++) {
+				for (j = 0; j < events_list.length; j++) {
+					if (tasksToRemove[i].id === events_list[j].id) {
+						events_list.splice(j, 1);
+						j--;
+					}
+				}
+			}
+			console.log(events_list);
+
+			refreshCalendarEvents(events_list);
+
 		}
 		
 
@@ -225,9 +287,21 @@ $(document).ready(function() {
 		if (isSelection) {
 			var eventsToDisplay = gon.all_events[this.id];
 
+			console.log('eventsToDisplay');
+			console.log(eventsToDisplay);
+
 			$.each(eventsToDisplay, function(key, val) {
+				//continue if cancelled event or undefined start and end dates
+				if ((val.status === 'cancelled') || (val.start.dateTime === undefined) || (val.end.dateTime === undefined)) {
+					return true;
+				}
+
+				if (val.title === undefined) {
+					val.title = '';
+				}
 				
 				var event = {
+					cal_id: val.iCalUID,
 					title: val.title,
 					start: val.start.dateTime,
 					end: val.end.dateTime
@@ -235,13 +309,32 @@ $(document).ready(function() {
 				
 				events_list.push(event);
 
-			refreshCalendarEvents();
-
 			});
+
+			console.log(events_list);
+			refreshCalendarEvents(events_list);
+		} else {
+			console.log('enters here');
+			console.log(this.id);
+			var eventsToRemove = gon.all_events[this.id];
+			console.log('eventsToRemove');
+
+			console.log(eventsToRemove);
+			for (i = 0; i < eventsToRemove.length; i++) {
+				for (j = 0; j < events_list.length; j++) {
+					if (eventsToRemove[i].iCalUID === events_list[j].cal_id) {
+						events_list.splice(j, 1);
+						j--;
+					}
+				}	
+			}
+			console.log(events_list);
+
+			refreshCalendarEvents(events_list);
 		}
 
 	});
 	
-	refreshCalendarEvents();	
+	refreshCalendarEvents([]);	
 
 });

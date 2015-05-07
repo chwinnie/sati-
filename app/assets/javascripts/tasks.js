@@ -11,23 +11,6 @@ $(document).ready(function() {
 	var tasks_time_estimates = {};
 	var MAX_DATE = moment().add(50, 'years'); //set as 50 years in future
 
-	tasks_list = [
-		{id: 13413, title: 'task 1', 
-			startTime: moment().format(), 
-			endTime: moment().add(1, 'hour').format(), 
-			dueDate: moment('5/6/2015')},
-		{id: 13413, 
-			title: 'task 2', 
-			startTime: moment().format(), 
-			endTime: moment().add(1, 'hour').format(), 
-			dueDate: moment('5/5/2015')},
-		{id: 13413, 
-			title: 'task 3', 
-			startTime: moment().format(), 
-			endTime: moment().add(1, 'hour').format(), 
-			dueDate: moment('8/5/2015')}
-	];
-
 	var refreshCalendarEvents = function refreshCalendarEvents(tasklist_events_list, calendar_events_list) {
 		var all_events_list = tasklist_events_list.concat(calendar_events_list);
 
@@ -71,27 +54,47 @@ $(document).ready(function() {
 
 	var updateTaskDuration = function updateTaskDuration(task_id, time_to_add) {
 		console.log('updateTaskDuration');
-		console.log(tasklist_events_list);
+		//store duration as minutes
+
+		// console.log(tasklist_events_list);
 		console.log(task_id);
 		console.log(time_to_add);
 
 		var taskIndexToUpdate;
 		var currTaskData;
 
-		$.each(tasklist_events_list, function(i, val) {
-			if (val.id === task_id) {
-				taskIndexToUpdate = i;
-				currTaskData = val;
-			}	
-		});
+		for (i = 0; i < tasklist_events_list.length; i++) {
+			var currTaskData = tasklist_events_list[i];
+			if (currTaskData.id === task_id) {
+				currTaskData['duration'] = parseInt(time_to_add)*60;
+				// currTaskData['start'] = moment();
+				// currTaskData['end'] = moment().add(1, 'hours');
+				var newTaskData = currTaskData;
 
-		console.log(taskIndexToUpdate);
-		console.log(currTaskData);
+				tasklist_events_list[i] = newTaskData;
+			}
+		}
 
-		currTaskData['duration'] = time_to_add;
-		tasklist_events_list[taskIndexToUpdate] = currTaskData;	
 
-		console.log(tasklist_events_list);
+		// $.each(tasklist_events_list, function(i, val) {
+		// 	// console.log(val);
+		// 	if (val.id === task_id) {
+		// 		taskIndexToUpdate = i;
+		// 		currTaskData = val;
+		// 	}	
+		// });
+
+		// // console.log(taskIndexToUpdate);
+		// // console.log(currTaskData);
+
+		// currTaskData['duration'] = time_to_add;
+		// tasklist_events_list[taskIndexToUpdate] = currTaskData;	
+
+		// for (i = 0; i < tasklist_events_list.length; i++) {
+		// 	console.log(tasklist_events_list[i].end.format());
+		// }
+
+		// console.log(tasklist_events_list);
 			
 	};
 
@@ -99,7 +102,7 @@ $(document).ready(function() {
 		return {
 			start: startVal,
 			end: endVal,
-			duration: endVal - startVal
+			duration: endVal.diff(startVal, 'minutes')
 		}
 	}
 
@@ -112,14 +115,28 @@ $(document).ready(function() {
 
 		var currStart = moment();
 		for (i = 0; i < calendar_events_list.length; i++) {
+
 			var currEvent = calendar_events_list[i];
 			var currEventStart = currEvent.start;
 
+			// console.log('currStart');
+			// console.log(currStart);
+			// console.log('currEventTitle');
+			// console.log(currEvent.title)
+			// console.log('currEventStart');
+			// console.log(currEventStart);
+
 			if (currStart.isBefore(currEventStart)) {
+				// console.log('currStart is before currEventStart');
 				var newFreeTimeBlock = createNewFreeTimeBlock(currStart, currEventStart);
 				freeTimeBlocks.push(newFreeTimeBlock);
-				currStart = currEvent.end;
-			}
+				// console.log(freeTimeBlocks);
+				
+			} 
+
+			// console.log('currEvent.end');
+			// console.log(currEvent.end);
+			currStart = currEvent.end;
 		}
 
 		var lastTimeInDay = moment().hours(23).minutes(59).seconds(59);
@@ -128,12 +145,20 @@ $(document).ready(function() {
 			freeTimeBlocks.push(newFreeTimeBlock);
 		}
 
-		// console.log(freeTimeBlocks);
 		return freeTimeBlocks;
 	}
 
 	var scheduleTasks = function scheduleTasks(freeTimeBlocks) {
 		console.log('scheduleTasks');
+
+		// for (i = 0; i < tasklist_events_list.length; i++) {
+		// 	console.log(tasklist_events_list[i].end.format());
+		// }
+
+		// for (i = 0; i < freeTimeBlocks.length; i++) {
+		// 	console.log(freeTimeBlocks[i]);
+		// }
+
 		var tasksLeftToSchedule = tasklist_events_list;
 		tasklist_events_list = [];
 
@@ -143,18 +168,39 @@ $(document).ready(function() {
 				var freeTimeBlock = freeTimeBlocks[i];
 				var task = tasksLeftToSchedule[j];
 
+				console.log('Looking at task...');
+				console.log(task.title);
+				console.log(task.start.format());
+				console.log(task.end.format());
+
+				console.log('Looking at freeTimeBlock...');
+				console.log(freeTimeBlock.start.format());
+				console.log(freeTimeBlock.end.format());
+
 				if ((task.duration === 0) || (freeTimeBlock.duration < task.duration)) {
+					console.log('skipped to next task');
 					continue; //dont' schedule
 				} else {
-
-					task['start'] = freeTimeBlock.start;
-					task['end'] = freeTimeBlock.start.add(task.duration, 'hours');
+					console.log('didt skip to next task');
+					console.log('freeTimeBlock start');
+					console.log(freeTimeBlock.start.format());
 
 					var updatedTask = task;
+					updatedTask.start = moment(freeTimeBlock.start.format());
+					updatedTask.end = moment(freeTimeBlock.start.format()).add(task.duration, 'minutes');
 					tasklist_events_list.push(updatedTask);
 
+					console.log('updated tasklist_events_list');
+					for (i = 0; i < tasklist_events_list.length; i++) {
+						var dateToCheckStart = tasklist_events_list[i].start;
+						var dateToCheckEnd = tasklist_events_list[i].end;
+						console.log(dateToCheckStart.format());
+						console.log(dateToCheckEnd.format());
+					}
+
+					var newFreeTimeBlockStart = moment(freeTimeBlock.start.format()).add(task.duration, 'minutes');
 					var updatedFreeTimeBlock = {
-						start: freeTimeBlock.start.add(task.duration, 'hours'),
+						start: newFreeTimeBlockStart,
 						end: freeTimeBlock.end,
 						duration: freeTimeBlock.duration - task.duration
 					};
@@ -166,13 +212,30 @@ $(document).ready(function() {
 				}
 			}
 		}
-		console.log(tasklist_events_list);
+		console.log('final tasklist_events_list');
+		for (i = 0; i < tasklist_events_list.length; i++) {
+			var dateToCheck = tasklist_events_list[i].end;
+			console.log(dateToCheck.format());
+		}
 	};
 
 	var calculateOptimalSchedule = function calculateOptimalSchedule(task_id, new_task_time_estimate) {
 		console.log('calculateOptimalSchedule'); 
-		console.log(task_id);
-		console.log(new_task_time_estimate);
+
+		// var yesterday = moment('5/6/2015');
+		// var tomorrow = moment('5/8/2015');
+		// for (i = 0; i < tasklist_events_list.length; i++) {
+		// 	var dateToCheck = tasklist_events_list[i].end;
+		// 	console.log(dateToCheck.format());
+		// 	console.log(dateToCheck);
+
+		// 	if ((dateToCheck.isAfter(yesterday)) && (dateToCheck.isBefore(tomorrow))) {
+		// 		console.log('yay');
+		// 	} else {
+		// 		console.log('uhoh');
+		// 	}
+		// }
+
 		async.waterfall([
 			function(callback) {
 				updateTaskDuration(task_id, new_task_time_estimate);
@@ -203,8 +266,9 @@ $(document).ready(function() {
 		        callback(null, calculateFreeTimeBlocks());
 		    },
 		    function(freeTimeBlocks, callback) {
-		    	console.log(freeTimeBlocks);
+		    	// console.log(freeTimeBlocks);
 		    	callback(null, scheduleTasks(freeTimeBlocks));
+		    	
 		    },
 		    function(callback) {
 		    	refreshCalendarEvents(tasklist_events_list, calendar_events_list);
@@ -212,10 +276,11 @@ $(document).ready(function() {
 		],
 		function(err, result) {
 		    if (err !== null) {
+		    	console.log('ERR');
 		    	console.log(err);
 		    }
 			
-		}.bind(this));
+		});
 
 
 
@@ -243,24 +308,6 @@ $(document).ready(function() {
 			$('.task_times_list').append('<tr id="'+task_id+'"><td>' + task_title + '</td><td><input type="numeric" class="task_time_estimate" name="'+task_id+'""></td></tr>')
 		});
 
-		$('.task_time_estimate').keyup(function(e) {
-			var new_task_time_estimate = $(this).val();
-
-			//check if not a number
-			if (isNaN(new_task_time_estimate)) {
-				showFlash('Not a number');
-				return;
-			}
-
-			//do nothing if empty string
-			if (new_task_time_estimate === '') {
-				return;
-			}
-
-			var task_id = this.name;
-
-			calculateOptimalSchedule(task_id, new_task_time_estimate);
-		});
 	};
 
 	var removeTasksForTimeEstimates = function removeTasksForTimeEstimates(tasksToRemove) {
@@ -269,16 +316,8 @@ $(document).ready(function() {
 		}
 	};
 
-	$('.tasklists_list tr').click(function() {
-
-		var isSelection = implementSelectionUI($(this));
-
-		if (isSelection) {
-			var tasksToDisplay = gon.all_tasks[this.id];
-
-			displayTasksForTimeEstimates(tasksToDisplay);
-
-			$.each(tasksToDisplay, function(key, val) {
+	var storeTaskData = function storeTaskData(tasksToDisplay) {
+		$.each(tasksToDisplay, function(key, val) {
 				var taskTimeEstimate = tasks_time_estimates[val.id];
 				var startTime = moment();
 				var endTime = moment().add(1, 'hour');
@@ -287,11 +326,10 @@ $(document).ready(function() {
 				if (val.due !== undefined) {
 					dueDate = moment(val.due); 
 				} else {
-					dueDate = moment(MAX_DATE); //no due date represented as max date
+					dueDate = moment(MAX_DATE); //if no due date, represent with max date
 				}
 
 				var task = {
-					tasklist_id: this.id,
 					id: val.id,
 					title: 'TASK ' + val.title,
 					start: startTime,
@@ -301,10 +339,99 @@ $(document).ready(function() {
 				}
 
 				tasklist_events_list.push(task);
-				
+			});
+	}
+
+	$('.tasklists_list tr').click(function() {
+
+		var isSelection = implementSelectionUI($(this));
+
+		if (isSelection) {
+			var tasksToDisplay = gon.all_tasks[this.id];
+
+			async.series({
+			    storeTaskData: function(callback){
+			    	storeTaskData(tasksToDisplay);
+			        callback(null, 1);
+			    },
+			    displayTaskTimeEstimatesUI: function(callback){
+
+			    	displayTasksForTimeEstimates(tasksToDisplay);
+			        callback(null, 1);
+			    },
+			    listenForTimeEstimateInputChange: function(callback) {
+			    	console.log('for keyup');
+			    	console.log(tasklist_events_list);
+
+					$('.task_time_estimate').keyup(function() {
+						console.log('keyup!');
+						for (i = 0; i < tasklist_events_list.length; i++) {
+							console.log(tasklist_events_list[i].end.format());
+						}
+
+						var new_task_time_estimate = $(this).val();
+
+						//check if not a number
+						if (isNaN(new_task_time_estimate)) {
+							showFlash('Not a number');
+							return;
+						}
+
+						//do nothing if empty string
+						if (new_task_time_estimate === '' || new_task_time_estimate === 0) {
+							return;
+						}
+
+						console.log('actually got here');
+						var task_id = this.name;
+
+						calculateOptimalSchedule(task_id, new_task_time_estimate);
+					});			    	
+			    }
+			},
+			function(err, results) {
+			    if (!err) {
+			    	console.log(results);
+			    	refreshCalendarEvents(tasklist_events_list, calendar_events_list);
+			    } else {
+			    	console.log(err);
+			    }
 			}.bind(this));
 
-			refreshCalendarEvents(tasklist_events_list, calendar_events_list);
+			// $.each(tasksToDisplay, function(key, val) {
+			// 	var taskTimeEstimate = tasks_time_estimates[val.id];
+			// 	var startTime = moment();
+			// 	var endTime = moment().add(1, 'hour');
+
+			// 	var dueDate;
+			// 	if (val.due !== undefined) {
+			// 		dueDate = moment(val.due); 
+			// 	} else {
+			// 		dueDate = moment(MAX_DATE); //no due date represented as max date
+			// 	}
+
+			// 	var task = {
+			// 		tasklist_id: this.id,
+			// 		id: val.id,
+			// 		title: 'TASK ' + val.title,
+			// 		start: startTime,
+			// 		end: endTime,
+			// 		due: dueDate,
+			// 		duration: 0
+			// 	}
+
+			// 	tasklist_events_list.push(task);
+			// }.bind(this));
+
+			// console.log('Adding tasks');
+			// for (i = 0; i < tasklist_events_list.length; i++) {
+			// 	console.log(tasklist_events_list[i]);
+			// }
+
+			// displayTasksForTimeEstimates(tasksToDisplay);
+
+
+			// refreshCalendarEvents(tasklist_events_list, calendar_events_list);
 		} else {
 			var tasksToRemove = gon.all_tasks[this.id];
 

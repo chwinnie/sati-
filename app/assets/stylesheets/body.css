@@ -9,3 +9,8 @@ body {
 	max-width: 900px;
 	margin: 0 auto;
 }
+
+#flash {
+    width: 50%;
+    margin: 0 auto;
+}

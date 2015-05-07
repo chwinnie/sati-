@@ -13,8 +13,7 @@ class TasksController < ApplicationController
 # end
 
 	def index
-		puts "I get called" 
-		
+
 		if (current_user.token.expired?)
 			current_user.token.refresh!
 		end

@@ -66,7 +66,7 @@ $(document).ready(function() {
 		for (i = 0; i < tasklist_events_list.length; i++) {
 			var currTaskData = tasklist_events_list[i];
 			if (currTaskData.id === task_id) {
-				currTaskData['duration'] = parseInt(time_to_add)*60;
+				currTaskData['duration'] = parseFloat(time_to_add)*60;
 				// currTaskData['start'] = moment();
 				// currTaskData['end'] = moment().add(1, 'hours');
 				var newTaskData = currTaskData;
@@ -90,9 +90,9 @@ $(document).ready(function() {
 		// currTaskData['duration'] = time_to_add;
 		// tasklist_events_list[taskIndexToUpdate] = currTaskData;	
 
-		// for (i = 0; i < tasklist_events_list.length; i++) {
-		// 	console.log(tasklist_events_list[i].end.format());
-		// }
+		for (i = 0; i < tasklist_events_list.length; i++) {
+			console.log(tasklist_events_list[i].duration);
+		}
 
 		// console.log(tasklist_events_list);
 			
@@ -151,16 +151,29 @@ $(document).ready(function() {
 	var scheduleTasks = function scheduleTasks(freeTimeBlocks) {
 		console.log('scheduleTasks');
 
-		// for (i = 0; i < tasklist_events_list.length; i++) {
-		// 	console.log(tasklist_events_list[i].end.format());
-		// }
+		for (i = 0; i < tasklist_events_list.length; i++) {
+			console.log(tasklist_events_list[i].end.format());
+		}
 
 		// for (i = 0; i < freeTimeBlocks.length; i++) {
 		// 	console.log(freeTimeBlocks[i]);
 		// }
 
-		var tasksLeftToSchedule = tasklist_events_list;
-		tasklist_events_list = [];
+
+		//copy tasklists event list
+		var tasksLeftToSchedule = [];
+		for (i = 0; i < tasklist_events_list.length; i++) {
+			tasksLeftToSchedule[i] = tasklist_events_list[i];
+		}
+
+		// console.log('tasksLeftToSchedule');
+		// for (i = 0; i < tasksLeftToSchedule.length; i++) {
+		// 	console.log(tasksLeftToSchedule[i].title.format());
+		// 	console.log(tasksLeftToSchedule[i].start.format());
+		// 	console.log(tasksLeftToSchedule[i].end.format());
+		// }
+
+		var tasks_to_display = [];
 
 		for (i = 0; i < freeTimeBlocks.length; i++) {
 			for (j = 0; j < tasksLeftToSchedule.length; j++) {
@@ -188,12 +201,12 @@ $(document).ready(function() {
 					var updatedTask = task;
 					updatedTask.start = moment(freeTimeBlock.start.format());
 					updatedTask.end = moment(freeTimeBlock.start.format()).add(task.duration, 'minutes');
-					tasklist_events_list.push(updatedTask);
+					tasks_to_display.push(updatedTask);
 
-					console.log('updated tasklist_events_list');
-					for (i = 0; i < tasklist_events_list.length; i++) {
-						var dateToCheckStart = tasklist_events_list[i].start;
-						var dateToCheckEnd = tasklist_events_list[i].end;
+					console.log('updated tasks_to_display');
+					for (i = 0; i < tasks_to_display.length; i++) {
+						var dateToCheckStart = tasks_to_display[i].start;
+						var dateToCheckEnd = tasks_to_display[i].end;
 						console.log(dateToCheckStart.format());
 						console.log(dateToCheckEnd.format());
 					}
@@ -212,11 +225,13 @@ $(document).ready(function() {
 				}
 			}
 		}
-		console.log('final tasklist_events_list');
-		for (i = 0; i < tasklist_events_list.length; i++) {
-			var dateToCheck = tasklist_events_list[i].end;
+		console.log('final tasks_to_display');
+		for (i = 0; i < tasks_to_display.length; i++) {
+			var dateToCheck = tasks_to_display[i].end;
 			console.log(dateToCheck.format());
 		}
+
+		return tasks_to_display;
 	};
 
 	var calculateOptimalSchedule = function calculateOptimalSchedule(task_id, new_task_time_estimate) {
@@ -266,12 +281,12 @@ $(document).ready(function() {
 		        callback(null, calculateFreeTimeBlocks());
 		    },
 		    function(freeTimeBlocks, callback) {
-		    	// console.log(freeTimeBlocks);
-		    	callback(null, scheduleTasks(freeTimeBlocks));
+		    	console.log(freeTimeBlocks);
+		    	var tasks_to_display = callback(null, scheduleTasks(freeTimeBlocks));
 		    	
 		    },
-		    function(callback) {
-		    	refreshCalendarEvents(tasklist_events_list, calendar_events_list);
+		    function(tasks_to_display, callback) {
+		    	refreshCalendarEvents(tasks_to_display, calendar_events_list);
 		    }
 		],
 		function(err, result) {

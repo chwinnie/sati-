@@ -198,7 +198,8 @@ $(document).ready(function() {
 					console.log('freeTimeBlock start');
 					console.log(freeTimeBlock.start.format());
 
-					var updatedTask = task;
+					// var updatedTask = task;
+					var updatedTask = $.extend({}, task);
 					updatedTask.start = moment(freeTimeBlock.start.format());
 					updatedTask.end = moment(freeTimeBlock.start.format()).add(task.duration, 'minutes');
 					tasks_to_display.push(updatedTask);

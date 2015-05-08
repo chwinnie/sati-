@@ -11,7 +11,7 @@ Note: you must have tasks in your Google Tasklists and events on your Google Cal
 * Async to handle calculation sequences, such as calculating the optimal schedule (sorting the tasklist in order of due date and the calendar event list in order of start time, calculating free time blocks outside of calendar events and finally scheduling the tasks)
 
 # Known bugs:
-Google Authentication takes a minute to load--still need to optimize the API calls. So if you reload the /tasks page, it will take a minute.
+Google Authentication takes a minute to load--still need to optimize the API calls. So if you reload the '/tasks' page, it will take a minute.
 
 # Heroku link:
 https://satia.herokuapp.com/

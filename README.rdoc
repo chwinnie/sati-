@@ -1,14 +1,22 @@
 == Sati
 
-Sati compiles your Google Tasks and Google Calendar events for just the day to help you achieve full productivity. Authenticate through your Google account, and then choose which tasklists and calendar to pull tasks and events from. Enter the estimated time you believe each task will take (a feature that Google Tasks still lacks). Sati will then optimize and schedule the order in which you should complete the tasks, as well as show any events you need to attend.
+Sati compiles your Google Tasks and Google Calendar events for JUST the day to help you focus and achieve full productivity. Authenticate through your Google account, and then choose which tasklists and calendar to pull tasks and events from. Enter the estimated time you believe each task will take (a feature that Google Tasks still lacks). Sati will then optimize and schedule the order in which you should complete the tasks based on the due date, as well as show any events you need to attend on the calendar.
 
-Known bugs:
-Google Authentication takes a minute to load--still need to optimize the API calls.
+Note: you must have tasks in your Google Tasklists and events on your Google Calendars in order for any data to show on the calendar. Further, Sati will only show an optimal order to complete the tasks on the calendar if you have due dates entered on your Google Tasks. Otherwise Sati will simply show the tasks in a random order.
 
-Heroku link:
+# Features:
+* Google authentication in tasks_helper.rb, using devise for User table and using a Token table to refresh tokens
+* JQuery for displaying UI
+* JQuery flash messages for invalid input for task time estimates
+
+
+# Known bugs:
+Google Authentication takes a minute to load--still need to optimize the API calls. So if you reload the /tasks page, it will take a minute.
+
+# Heroku link:
 https://satia.herokuapp.com/
 
-Gems used:
+# Gems used:
 * devise
 * omniauth-google-oauth2
 * google-api-client
@@ -16,6 +24,7 @@ Gems used:
 * momentjs-rails
 * gon
 * twitter-bootstrap-rails
+* async-rails
 
-Gems used for development:
+# Gems used for development:
 * table_print

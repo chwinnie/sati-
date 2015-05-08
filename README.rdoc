@@ -22,6 +22,8 @@ Note: you must have tasks in your Google Tasklists and events on your Google Cal
 -------------------------
 https://satia.herokuapp.com/
 
+==Gems: 
+-------------------------
 # Gems used:
 * devise
 * omniauth-google-oauth2

@@ -9,6 +9,7 @@ $(document).ready(function() {
 	var refreshCalendarEvents = function refreshCalendarEvents(tasklist_events_list, calendar_events_list) {
 		//show both tasklist and calendar events
 		var all_events_list = tasklist_events_list.concat(calendar_events_list);
+		console.log(all_events_list);
 
 		//remove curr calendar
 		$('#calendar').remove();
@@ -123,7 +124,6 @@ $(document).ready(function() {
 					continue; //dont' schedule
 				} else {
 
-
 					// copy task
 					var updatedTask = $.extend({}, task);
 					updatedTask.start = moment(freeTimeBlock.start.format());
@@ -178,8 +178,7 @@ $(document).ready(function() {
 		        callback(null, calculateFreeTimeBlocks());
 		    },
 		    function(freeTimeBlocks, callback) {
-		    	var tasks_to_display = callback(null, scheduleTasks(freeTimeBlocks));
-		    	
+		    	callback(null, scheduleTasks(freeTimeBlocks));
 		    },
 		    function(tasks_to_display, callback) {
 		    	refreshCalendarEvents(tasks_to_display, calendar_events_list);
@@ -270,6 +269,7 @@ $(document).ready(function() {
 			async.series({
 			    storeTaskData: function(callback){
 			    	storeTaskData(tasksToDisplay);
+			    	refreshCalendarEvents(tasklist_events_list, calendar_events_list);
 			        callback(null, 1);
 			    },
 			    displayTaskTimeEstimatesUI: function(callback){
@@ -300,11 +300,9 @@ $(document).ready(function() {
 			    }
 			},
 			function(err, results) {
-			    if (!err) {
-			    	refreshCalendarEvents(tasklist_events_list, calendar_events_list);
-			    } else {
+			    if (err) {
 			    	console.log(err);
-			    }
+			    } 
 			}.bind(this));
 
 		} else {

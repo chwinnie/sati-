@@ -11,9 +11,6 @@ $(document).ready(function() {
 		//show both tasklist and calendar events
 		var all_events_list = tasklist_events_list.concat(calendar_events_list);
 
-		console.log('refreshCalendarEvents');
-		console.log(all_events_list);
-
 		//remove curr calendar
 		$('#calendar').remove();
 		$('.calendar_row').append('<div id="calendar" style="display:block"></div>');
@@ -47,12 +44,14 @@ $(document).ready(function() {
 		}
 	};
 
-	/*Flow for calculating optimal schedule (in calculateOptimalSchedule, which uses an async waterfall):
-		-Update the task duration from user input in the "Enter task duration"
-		-Sorting the tasks list in order of due date, calendar events list in order of start time
-		-Calculate the free time blocks around the calendar events using sorted calendar events list
-		-Schedule the tasks in order of due date (tasks due earlier assumed to be priority) in the free time blocks, tasks without due dates are considered lowest priority.
-	 */
+
+	/*------------------------------------------------------------------------------------------------
+		Async waterfall for calculateOptimalSchedule():
+			-Update the task duration from user input in the "Enter task duration"
+			-Sorting the tasks list in order of due date, calendar events list in order of start time
+			-Calculate the free time blocks around the calendar events using sorted calendar events list
+			-Schedule the tasks in order of due date (tasks due earlier assumed to be priority) in the free time blocks, tasks without due dates are considered lowest priority.
+	 ------------------------------------------------------------------------------------------------*/
 	var updateTaskDuration = function updateTaskDuration(task_id, time_to_add) {
 
 		//find task to update
@@ -78,7 +77,6 @@ $(document).ready(function() {
 	}
 
 	var calculateFreeTimeBlocks = function calculateFreeTimeBlocks() {
-		console.log('calculateFreeTimeBlocks');
 		var freeTimeBlocks = [];
 
 		var currStart = moment();
@@ -159,7 +157,6 @@ $(document).ready(function() {
 				callback(null);
 			},
 			function(callback){
-				console.log('tasklist sort');
 		        //sort events_list by dueDate, assume dueDates are Moments
 				tasklist_events_list.sort(function(t1, t2) {
 					var dueDate1 = t1.due;
@@ -170,7 +167,6 @@ $(document).ready(function() {
 		        
 		    },
 		    function(callback){
-		    	console.log('calendar sort');
 		    	//sort calendar events by start time
 				calendar_events_list.sort(function(b1, b2) {
 					var start1 = b1.start;
@@ -183,7 +179,6 @@ $(document).ready(function() {
 		        callback(null, calculateFreeTimeBlocks());
 		    },
 		    function(freeTimeBlocks, callback) {
-		    	console.log(freeTimeBlocks);
 		    	var tasks_to_display = callback(null, scheduleTasks(freeTimeBlocks));
 		    	
 		    },
@@ -201,32 +196,18 @@ $(document).ready(function() {
 		
 	};
 
-	var showFlash = function showFlash(message) {
-		if ( ($('#flash').css('display') === 'block') && ($('#flash').text() === message) ) {
-			return;
-		}
+	/*------------------------------------------------------------------------------------------------
+		For tasks UI or tasklists click jquery function:
 
-	    $('.task-time-col').prepend('<div id="flash" style="display:none"></div>');
-	    $('#flash').html(message);
-	    $('#flash').slideDown('slow').delay(1500).slideUp('slow');
-	};
+		Async series for selecting a tasklist or adding the tasklist's tasks:
+			-storeTaskData() - using tasklist ID in html, match with ruby data accessed through gon to get and store that tasklist's tasks data
+			-displayTasksforTimeEstimates - display tasks time estimate panel in DOM
+			-listenForTimeEstimateInputChange - set up keyup jquery function on task time estimate input boxes. Upon change in input boxes, recalculate optimal schedule. Show flash message if user gives non numeric input for time estimates.
 
-	var displayTasksForTimeEstimates = function displayTasksForTimeEstimates(tasksToDisplay) {
+		Functions for unselecting a tasklist or removing the tasklist's tasks:
+			-removeTasksFromTimeEstimatesPanel - remove tasks from tasklists panel in the DOM
 
-		$.each(tasksToDisplay, function(key, val) {
-			var task_title = val.title;
-			var task_id = val.id;
-			
-			$('.task_times_list').append('<tr id="'+task_id+'"><td>' + task_title + '</td><td><input type="numeric" class="task_time_estimate" name="'+task_id+'""></td></tr>')
-		});
-
-	};
-
-	var removeTasksForTimeEstimates = function removeTasksForTimeEstimates(tasksToRemove) {
-		for (i = 0; i < tasksToRemove.length; i++) {
-			$('#' + tasksToRemove[i].id).remove();
-		}
-	};
+	 ------------------------------------------------------------------------------------------------*/
 
 	var storeTaskData = function storeTaskData(tasksToDisplay) {
 		$.each(tasksToDisplay, function(key, val) {
@@ -254,6 +235,32 @@ $(document).ready(function() {
 			});
 	}
 
+	var displayTasksForTimeEstimates = function displayTasksForTimeEstimates(tasksToDisplay) {
+
+		$.each(tasksToDisplay, function(key, val) {
+			var task_title = val.title;
+			var task_id = val.id;
+			
+			$('.task_times_list').append('<tr id="'+task_id+'"><td>' + task_title + '</td><td><input type="numeric" class="task_time_estimate" name="'+task_id+'""></td></tr>')
+		});
+	};
+
+	var showFlash = function showFlash(message) {
+		if ( ($('#flash').css('display') === 'block') && ($('#flash').text() === message) ) {
+			return;
+		}
+
+	    $('.task-time-col').prepend('<div id="flash" style="display:none"></div>');
+	    $('#flash').html(message);
+	    $('#flash').slideDown('slow').delay(1500).slideUp('slow');
+	};
+
+	var removeTasksFromTimeEstimatesPanel = function removeTasksFromTimeEstimatesPanel(tasksToRemove) {
+		for (i = 0; i < tasksToRemove.length; i++) {
+			$('#' + tasksToRemove[i].id).remove();
+		}
+	};
+
 	$('.tasklists_list tr').click(function() {
 		$('#task-time-estimates-instructions').css('visibility', 'visible');
 
@@ -273,14 +280,8 @@ $(document).ready(function() {
 			        callback(null, 1);
 			    },
 			    listenForTimeEstimateInputChange: function(callback) {
-			    	console.log('for keyup');
-			    	console.log(tasklist_events_list);
 
 					$('.task_time_estimate').keyup(function() {
-						console.log('keyup!');
-						for (i = 0; i < tasklist_events_list.length; i++) {
-							console.log(tasklist_events_list[i].end.format());
-						}
 
 						var new_task_time_estimate = $(this).val();
 
@@ -294,7 +295,6 @@ $(document).ready(function() {
 							updateTaskDuration(task_id, 0);
 						}
 
-						console.log('actually got here');
 						var task_id = this.name;
 
 						calculateOptimalSchedule(task_id, new_task_time_estimate);
@@ -303,7 +303,6 @@ $(document).ready(function() {
 			},
 			function(err, results) {
 			    if (!err) {
-			    	console.log(results);
 			    	refreshCalendarEvents(tasklist_events_list, calendar_events_list);
 			    } else {
 			    	console.log(err);
@@ -313,7 +312,7 @@ $(document).ready(function() {
 		} else {
 			var tasksToRemove = gon.all_tasks[this.id];
 
-			removeTasksForTimeEstimates(tasksToRemove);
+			removeTasksFromTimeEstimatesPanel(tasksToRemove);
 
 			for (i = 0; i < tasksToRemove.length; i++) {
 				for (j = 0; j < tasklist_events_list.length; j++) {
@@ -330,14 +329,15 @@ $(document).ready(function() {
 
 	});
 
+/*------------------------------------------------------------------------------------------------
+		For calendar events UI or calendars click jquery function: similar to above without calculating optimal schedule.
+	 ------------------------------------------------------------------------------------------------*/
+
 	$('.calendars_list tr').click(function() {
 		var isSelection = implementSelectionUI($(this));
 
 		if (isSelection) {
 			var eventsToDisplay = gon.all_events[this.id];
-
-			console.log('eventsToDisplay');
-			console.log(eventsToDisplay);
 
 			$.each(eventsToDisplay, function(key, val) {
 				//continue if cancelled event or undefined start and end dates
@@ -360,14 +360,15 @@ $(document).ready(function() {
 					end: moment(val.end.dateTime)
 				}
 				
+				//store calendar events data
 				calendar_events_list.push(event);
 
 			}.bind(this));
 
-			// console.log(calendar_events_list);
 			refreshCalendarEvents(tasklist_events_list, calendar_events_list);
 		} else {
 
+			//remove calendar events 
 			for (i = 0; i < calendar_events_list.length; i++) {
 				if (calendar_events_list[i].cal_id === this.id) {
 					calendar_events_list.splice(i, 1);

@@ -4,7 +4,6 @@ $(document).ready(function() {
 	var tasklist_events_list = [];
 	
 	var eventsToDisplay = [];
-	var tasks_time_estimates = {};
 	var MAX_DATE = moment().add(50, 'years'); //set as 50 years in future
 
 	var refreshCalendarEvents = function refreshCalendarEvents(tasklist_events_list, calendar_events_list) {
@@ -211,7 +210,6 @@ $(document).ready(function() {
 
 	var storeTaskData = function storeTaskData(tasksToDisplay) {
 		$.each(tasksToDisplay, function(key, val) {
-				var taskTimeEstimate = tasks_time_estimates[val.id];
 				var startTime = moment();
 				var endTime = moment().add(1, 'hour');
 

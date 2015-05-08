@@ -9,7 +9,6 @@ $(document).ready(function() {
 	var refreshCalendarEvents = function refreshCalendarEvents(tasklist_events_list, calendar_events_list) {
 		//show both tasklist and calendar events
 		var all_events_list = tasklist_events_list.concat(calendar_events_list);
-		console.log(all_events_list);
 
 		//remove curr calendar
 		$('#calendar').remove();

@@ -189,21 +189,6 @@ $(document).ready(function() {
 	};
 
 	var calculateOptimalSchedule = function calculateOptimalSchedule(task_id, new_task_time_estimate) {
-		console.log('calculateOptimalSchedule'); 
-
-		// var yesterday = moment('5/6/2015');
-		// var tomorrow = moment('5/8/2015');
-		// for (i = 0; i < tasklist_events_list.length; i++) {
-		// 	var dateToCheck = tasklist_events_list[i].end;
-		// 	console.log(dateToCheck.format());
-		// 	console.log(dateToCheck);
-
-		// 	if ((dateToCheck.isAfter(yesterday)) && (dateToCheck.isBefore(tomorrow))) {
-		// 		console.log('yay');
-		// 	} else {
-		// 		console.log('uhoh');
-		// 	}
-		// }
 
 		async.waterfall([
 			function(callback) {
@@ -313,7 +298,7 @@ $(document).ready(function() {
 
 	$('.tasklists_list tr').click(function() {
 		$('#task-time-estimates-instructions').css('visibility', 'visible');
-		
+
 		var isSelection = implementSelectionUI($(this));
 
 		if (isSelection) {

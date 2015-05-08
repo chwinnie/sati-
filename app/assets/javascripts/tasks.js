@@ -47,6 +47,12 @@ $(document).ready(function() {
 		}
 	};
 
+	/*Flow for calculating optimal schedule (in calculateOptimalSchedule, which uses an async waterfall):
+		-Update the task duration from user input in the "Enter task duration"
+		-Sorting the tasks list in order of due date, calendar events list in order of start time
+		-Calculate the free time blocks around the calendar events using sorted calendar events list
+		-Schedule the tasks in order of due date (tasks due earlier assumed to be priority) in the free time blocks, tasks without due dates are considered lowest priority.
+	 */
 	var updateTaskDuration = function updateTaskDuration(task_id, time_to_add) {
 
 		//find task to update
@@ -87,8 +93,6 @@ $(document).ready(function() {
 				freeTimeBlocks.push(newFreeTimeBlock);
 			} 
 
-			// console.log('currEvent.end');
-			// console.log(currEvent.end);
 			currStart = currEvent.end;
 		}
 
@@ -102,29 +106,12 @@ $(document).ready(function() {
 	}
 
 	var scheduleTasks = function scheduleTasks(freeTimeBlocks) {
-		console.log('scheduleTasks');
-
-		for (i = 0; i < tasklist_events_list.length; i++) {
-			console.log(tasklist_events_list[i].end.format());
-		}
-
-		// for (i = 0; i < freeTimeBlocks.length; i++) {
-		// 	console.log(freeTimeBlocks[i]);
-		// }
-
 
 		//copy tasklists event list
 		var tasksLeftToSchedule = [];
 		for (i = 0; i < tasklist_events_list.length; i++) {
 			tasksLeftToSchedule[i] = tasklist_events_list[i];
 		}
-
-		// console.log('tasksLeftToSchedule');
-		// for (i = 0; i < tasksLeftToSchedule.length; i++) {
-		// 	console.log(tasksLeftToSchedule[i].title.format());
-		// 	console.log(tasksLeftToSchedule[i].start.format());
-		// 	console.log(tasksLeftToSchedule[i].end.format());
-		// }
 
 		var tasks_to_display = [];
 
@@ -134,36 +121,17 @@ $(document).ready(function() {
 				var freeTimeBlock = freeTimeBlocks[i];
 				var task = tasksLeftToSchedule[j];
 
-				// console.log('Looking at task...');
-				// console.log(task.title);
-				// console.log(task.start.format());
-				// console.log(task.end.format());
-
-				// console.log('Looking at freeTimeBlock...');
-				// console.log(freeTimeBlock.start.format());
-				// console.log(freeTimeBlock.end.format());
-
+				//task duration of 0 means user did not yet update
 				if ((task.duration === 0) || (freeTimeBlock.duration < task.duration)) {
-					console.log('skipped to next task');
 					continue; //dont' schedule
 				} else {
-					console.log('didt skip to next task');
-					console.log('freeTimeBlock start');
-					console.log(freeTimeBlock.start.format());
+
 
 					// copy task
 					var updatedTask = $.extend({}, task);
 					updatedTask.start = moment(freeTimeBlock.start.format());
 					updatedTask.end = moment(freeTimeBlock.start.format()).add(task.duration, 'minutes');
 					tasks_to_display.push(updatedTask);
-
-					console.log('updated tasks_to_display');
-					for (i = 0; i < tasks_to_display.length; i++) {
-						var dateToCheckStart = tasks_to_display[i].start;
-						var dateToCheckEnd = tasks_to_display[i].end;
-						console.log(dateToCheckStart.format());
-						console.log(dateToCheckEnd.format());
-					}
 
 					var newFreeTimeBlockStart = moment(freeTimeBlock.start.format()).add(task.duration, 'minutes');
 					var updatedFreeTimeBlock = {
@@ -178,11 +146,6 @@ $(document).ready(function() {
 
 				}
 			}
-		}
-		console.log('final tasks_to_display');
-		for (i = 0; i < tasks_to_display.length; i++) {
-			var dateToCheck = tasks_to_display[i].end;
-			console.log(dateToCheck.format());
 		}
 
 		return tasks_to_display;
@@ -235,9 +198,6 @@ $(document).ready(function() {
 		    }
 			
 		});
-
-
-
 		
 	};
 
@@ -248,9 +208,7 @@ $(document).ready(function() {
 
 	    $('.task-time-col').prepend('<div id="flash" style="display:none"></div>');
 	    $('#flash').html(message);
-	    // jQuery('#flash').toggleClass('');
 	    $('#flash').slideDown('slow').delay(1500).slideUp('slow');
-	    // $('#flash').click(function () { $('#flash').toggle('highlight') });
 	};
 
 	var displayTasksForTimeEstimates = function displayTasksForTimeEstimates(tasksToDisplay) {
@@ -332,9 +290,8 @@ $(document).ready(function() {
 							return;
 						}
 
-						//do nothing if empty string
 						if (new_task_time_estimate === '' || new_task_time_estimate === 0) {
-							return;
+							updateTaskDuration(task_id, 0);
 						}
 
 						console.log('actually got here');

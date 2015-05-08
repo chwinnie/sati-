@@ -19,7 +19,7 @@ Note: you must have tasks in your Google Tasklists and events on your Google Cal
 * Events or Tasks that are very short in duration (<1 hour) do not display the title well on FullCalendar. This is a rather big problem especially for tasks as tasks that take <1 hour to complete are definitely common. Again, the original FullCalendar code needs to be modified for better UI in this situation.
 
 
-==Heroku link: 
+== Heroku link: 
 -------------------------
 https://satia.herokuapp.com/
 

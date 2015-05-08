@@ -1,10 +1,11 @@
-== Sati
+Sati
+================================
 
 Sati compiles your Google Tasks and Google Calendar events for JUST the day to help you focus and achieve full productivity. Authenticate through your Google account, and then choose which tasklists and calendar to pull tasks and events from. Enter the estimated time you believe each task will take (a feature that Google Tasks still lacks). Sati will then optimize and schedule the order in which you should complete the tasks based on the due date, as well as show any events you need to attend on the calendar.
 
 Note: you must have tasks in your Google Tasklists and events on your Google Calendars in order for any data to show on the calendar. Further, Sati will only show an optimal order to complete the tasks on the calendar if you have due dates entered on your Google Tasks. Otherwise Sati will simply show the tasks in a random order.
 
-Features 
+# Features 
 -------------------------
 * Google authentication in tasks_helper.rb, using devise for User table and using a Token table to refresh tokens
 * JQuery for displaying UI

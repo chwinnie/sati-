@@ -25,7 +25,7 @@ https://satia.herokuapp.com/
 
 ==Gems: 
 -------------------------
-# Gems used:
+Gems used:
 * devise
 * omniauth-google-oauth2
 * google-api-client
@@ -35,5 +35,5 @@ https://satia.herokuapp.com/
 * twitter-bootstrap-rails
 * async-rails
 
-# Gems used for development: #
+Gems used for development: 
 * table_print
